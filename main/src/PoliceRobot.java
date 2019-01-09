@@ -18,6 +18,10 @@ public class PoliceRobot extends Agent {
     RangeSensorBelt sonars;
     CameraSensor camera;
 
+    private MyEnv ev;  // 环境实例，用于获取环境中的因素
+    private double velocity = 0.5;      // 速度
+    private boolean debug = false;      // 调试状态
+
     public PoliceRobot(Vector3d position, String name) {
         super(position,name);
         camera = RobotFactory.addCameraSensor(this);
@@ -26,6 +30,16 @@ public class PoliceRobot extends Agent {
 
     public void initBehavior() {}
 
+    void setParams(MyEnv ev, double velocity, boolean debug) {
+        setParams(ev);
+        this.velocity = velocity;
+        this.debug = debug;
+    }
+
+    void setParams(MyEnv ev) {
+        this.ev = ev;
+    }
+
     /**
      * 运动算法
      */
@@ -33,14 +47,11 @@ public class PoliceRobot extends Agent {
 
         // 瞎跑~~~~~~~
         // progress at 0.5 m/s
-        setTranslationalVelocity(0.5);
+        setTranslationalVelocity(velocity);
         // frequently change orientation
         if ((getCounter() % 100) == 0)
             setRotationalVelocity(Math.PI / 2 * (0.5 - Math.random()));
 
-        // print front sonar every 100 frames
-        if (getCounter() % 100 == 0)
-            System.out.println("Sonar num 0  = " + sonars.getMeasurement(0));
     }
 
     /**

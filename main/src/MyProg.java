@@ -9,7 +9,8 @@ import simbad.sim.EnvironmentDescription;
 public class MyProg {
 
     public static void main(String[] args) {
-        EnvironmentDescription ev = new MyEnv();
+        MyEnv ev = new MyEnv(true);
+        ev.setSpeed(1,1);
         Simbad frame = new Simbad(ev ,false);
     }
 }

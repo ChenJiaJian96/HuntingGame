@@ -1,7 +1,11 @@
+import javax.vecmath.Point3d;
 import javax.vecmath.Vector2d;
 
 public class MyUtil {
     private static MyUtil mInstance;
+    private static final double REPEL_CONSTANT = 10.0;       // 斥力因子
+    private static final double REPEL_RANGE = 2.0;           // 计算斥力的最小距离
+    private static final double ATTRACT_CONSTANT = 30.0;     // 引力因子
 
     public static MyUtil getInstance() {
         if (mInstance == null)
@@ -9,8 +13,10 @@ public class MyUtil {
         return mInstance;
     }
 
-    public static int getQuadrant(Vector2d vector)//获取象限
-    {
+    /**
+     * 获取象限
+     */
+    static int getQuadrant(Vector2d vector) {
         double x = vector.x;
         double y = vector.y;
         if (x > 0 && y > 0)// 第一象限
@@ -37,79 +43,62 @@ public class MyUtil {
         } else if (x == 0 && y < 0)// y负半轴
         {
             return -4;
-        } else
-        {
+        } else {
             return 0;
         }
     }
 
-    public static double getAngle(Vector2d v1, Vector2d v2)//获取两个向量间的夹角
-    {
-
+    /**
+     * 获取两个向量间的夹角
+     */
+    static double getAngle(Vector2d v1, Vector2d v2) {
         double k = v1.y / v1.x;
         double y = k * v2.x;
-        switch (getQuadrant(v1))
-        {
+        switch (getQuadrant(v1)) {
             case 1:
             case 4:
             case -1:
-                if (v2.y > y)
-                {
+                if (v2.y > y) {
                     return v1.angle(v2);
-                } else if (v2.y < y)
-                {
+                } else if (v2.y < y) {
                     return 2 * Math.PI - v1.angle(v2);
-                } else
-                {
-                    if (v1.x * v2.x < 0)
-                    {
+                } else {
+                    if (v1.x * v2.x < 0) {
                         return Math.PI;
-                    } else
-                    {
+                    } else {
                         return 0;
                     }
                 }
             case 2:
             case 3:
             case -3:
-                if (v2.y > y)
-                {
+                if (v2.y > y) {
                     return 2 * Math.PI - v1.angle(v2);
-                } else if (v2.y < y)
-                {
+                } else if (v2.y < y) {
                     return v1.angle(v2);
-                } else
-                {
-                    if (v1.x * v2.x < 0)
-                    {
+                } else {
+                    if (v1.x * v2.x < 0) {
                         return Math.PI;
-                    } else
-                    {
+                    } else {
                         return 0;
                     }
                 }
             case -2:
                 int i = getQuadrant(v2);
-                if (i == -4)
-                {
+                if (i == -4) {
                     return Math.PI;
-                } else if (i == -2 || i == -1 || i == 1 || i == 4)
-                {
+                } else if (i == -2 || i == -1 || i == 1 || i == 4) {
                     return 2 * Math.PI - v1.angle(v2);
-                } else
-                {
+                } else {
                     return v1.angle(v2);
                 }
             case -4:
                 int j = getQuadrant(v2);
-                if (j == -1)
-                {
+                if (j == -1) {
                     return Math.PI;
-                } else if (j == -4 || j == -1 || j == 1 || j == 4)
-                {
+                } else if (j == -4 || j == -1 || j == 1 || j == 4) {
                     return v1.angle(v2);
-                } else
-                {
+                } else {
                     return 2 * Math.PI - v1.angle(v2);
                 }
             default:
@@ -118,8 +107,10 @@ public class MyUtil {
 
     }
 
-    public static Vector2d transform(Vector2d v, Vector2d point)//计算方向向量
-    {
+    /**
+     * 计算方向向量
+     */
+    static Vector2d transform(Vector2d v, Vector2d point) {
         Vector2d global = new Vector2d(1, 0);
         double alfa = getAngle(global, v);
         double beta = getAngle(point, v);
@@ -132,5 +123,22 @@ public class MyUtil {
 
         return new Vector2d(x, y);
 
+    }
+
+    /**
+     * 计算斥力
+     */
+    static double repelForce(double distance) {
+        double force = 0;
+        if (distance <= REPEL_RANGE)
+            force = REPEL_CONSTANT / (distance * distance);
+        return force;
+    }
+
+    /**
+     * 计算引力
+     */
+    static double attractForce(double distance) {
+        return ATTRACT_CONSTANT * distance;
     }
 }
