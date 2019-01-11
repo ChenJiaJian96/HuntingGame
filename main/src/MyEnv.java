@@ -18,7 +18,6 @@ public class MyEnv extends EnvironmentDescription {
     private PoliceRobot p1;
     private PoliceRobot p2;
     private PoliceRobot p3;
-    private PoliceRobot p4;
 
     private boolean debug;  // 调试模式
     private double police_speed = 1;
@@ -38,8 +37,7 @@ public class MyEnv extends EnvironmentDescription {
         Wall w4 = new Wall(new Vector3d(0, 0, -10), 20, 1, this);
         add(w4);
 
-        // 构造障碍物
-        buildObstacles();
+         buildObstacles();
 
         // 场景构建成功后构建机器人
         thiefRobot = new ThiefRobot(new Vector3d(0, 0, 0), "THIEF");
@@ -52,10 +50,11 @@ public class MyEnv extends EnvironmentDescription {
 //        add(p2);
 //        p3 = new PoliceRobot(new Vector3d(9, 0, 9), "POLICE3");
 //        add(p3);
-//        p4 = new PoliceRobot(new Vector3d(-9, 0, 9), "POLICE4");
-//        add(p4);
     }
 
+    /**
+     * 生成障碍物
+     */
     private void buildObstacles() {
         //墙型障碍物
         Wall w7 = new Wall(new Vector3d(-7, 0, 7), 3, 1, this);
@@ -123,9 +122,5 @@ public class MyEnv extends EnvironmentDescription {
 
     public PoliceRobot getP3() {
         return p3;
-    }
-
-    public PoliceRobot getP4() {
-        return p4;
     }
 }

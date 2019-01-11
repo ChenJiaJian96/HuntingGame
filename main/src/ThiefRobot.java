@@ -22,6 +22,7 @@ public class ThiefRobot extends Agent {
     private MyEnv ev;  // 环境实例，用于获取环境中的因素
     private double velocity = 0.5;  // 速度
     boolean debug = false;
+    private static int freeze_time = 0;
 
     ThiefRobot(Vector3d position, String name) {
         super(position, name);
@@ -36,7 +37,7 @@ public class ThiefRobot extends Agent {
         this.debug = debug;
     }
 
-    void setParams(MyEnv ev) {
+    private void setParams(MyEnv ev) {
         this.ev = ev;
     }
 
@@ -51,18 +52,19 @@ public class ThiefRobot extends Agent {
      */
     @Override
     protected void performBehavior() {
-        setTranslationalVelocity(velocity);
+
         if (getCounter() % 10 == 0) {
+
             // 获取速度
             Vector3d velocity = this.linearVelocity;
 
             // 获取当前运动方向
             Vector2d direct = new Vector2d(velocity.z, velocity.x);
 
-            // 获取当前运动位置
+            // 获取前一次运动位置
             Point3d p = new Point3d();
             getCoords(p);
-            Vector2d pos = new Vector2d(p.z, p.x);
+            Vector2d pre_pos = new Vector2d(p.z, p.x);
 
             Vector2d composition = new Vector2d(0, 0);
 
@@ -72,22 +74,22 @@ public class ThiefRobot extends Agent {
                 if (rf > 0) {
                     double k1 = Math.cos(i * Math.PI / 4);
                     double k2 = Math.sin(i * Math.PI / 4);
-                    Vector2d vf = new Vector2d(rf * k1, rf * -k2);
+                    Vector2d vf = new Vector2d(rf * -k1, rf * -k2);
                     composition.set(composition.x + vf.x, composition.y + vf.y);
                 }
             }
 
-            if (debug)
-                System.out.println("斥力：(" + composition.x + ","
-                        + composition.y);
+//            if (debug)
+//                System.out.println("斥力：(" + composition.x + ","
+//                        + composition.y);
 
             //给定斥力合力向量，此处合力就是斥力
             Vector2d allForces = MyUtil.transform(direct, composition);
             // 根据合力的方向和当前运动方向的夹角来判断当前转动角度
             double angle = MyUtil.getAngle(direct, allForces);
 
-            if (debug)
-                System.out.println("旋转角度：(" + angle);
+//            if (debug)
+//                System.out.println("旋转角度：(" + angle);
 
             // 判断转动方向
             if (angle < Math.PI)
@@ -98,17 +100,21 @@ public class ThiefRobot extends Agent {
                 setRotationalVelocity((angle - 2 * Math.PI));
             }
 
+            setTranslationalVelocity(this.velocity);
+
             // 碰撞情况处理
             // 检测是否碰撞
             if (bumpers.oneHasHit())
             {
+                if (debug)
+                    System.out.println("撞到了！！！");
                 lamp.setBlink(true);
                 // 机器人身体三个方向和障碍物的距离
                 double left = sonars.getFrontLeftQuadrantMeasurement();
                 double right = sonars.getFrontRightQuadrantMeasurement();
                 double front = sonars.getFrontQuadrantMeasurement();
                 // 如果接近障碍物
-                if ((front < 0.7) || (left < 0.7) || (right < 0.7))
+                if ((front < 1) || (left < 1) || (right < 1))
                 {
                     setTranslationalVelocity(0);
                     if (left < right)
@@ -123,6 +129,37 @@ public class ThiefRobot extends Agent {
             else
                 lamp.setBlink(false);
 
+            // 判断是否一直不动
+            // 获取前一次运动位置
+            getCoords(p);
+            Vector2d cur_pos = new Vector2d(p.z, p.x);
+            if (isStopForLong(pre_pos, cur_pos)) {
+                if (debug)
+                    System.out.println("卡住了！！！");
+                setTranslationalVelocity(0);
+                setRotationalVelocity(Math.PI);
+                freeze_time = 0;
+            }
+        }
+    }
+
+    /**
+     * 判断机器人是否达到平衡点而导致无法移动
+     * 人工势场法无法避免的bug
+     * 机器人受力为零
+     */
+    private boolean isStopForLong(Vector2d pre, Vector2d cur) {
+        if (cur.equals(pre)){
+            if (freeze_time == 20)
+                // 如果边界设置太小会影响正常的碰撞处理
+                return true;
+            else {
+                freeze_time++;
+                return false;
+            }
+        } else{
+            freeze_time = 0;
+            return false;
         }
     }
 }

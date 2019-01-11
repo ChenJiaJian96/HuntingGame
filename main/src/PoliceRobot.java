@@ -45,8 +45,6 @@ public class PoliceRobot extends Agent {
      */
     public void performBehavior() {
 
-        // 瞎跑~~~~~~~
-        // progress at 0.5 m/s
         setTranslationalVelocity(velocity);
         // frequently change orientation
         if ((getCounter() % 100) == 0)
