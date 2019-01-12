@@ -1,5 +1,4 @@
 import simbad.gui.Simbad;
-import simbad.sim.EnvironmentDescription;
 
 /**
  * 三警察机器人围捕盗贼机器人

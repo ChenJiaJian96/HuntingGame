@@ -21,6 +21,8 @@ public class PoliceRobot extends Agent {
     private MyEnv ev;  // 环境实例，用于获取环境中的因素
     private double velocity = 0.5;      // 速度
     private boolean debug = false;      // 调试状态
+    private boolean isLeader = false;   // 是否为领航机器人
+    private Vector2d targetPoint = new Vector2d();      // 目标点
 
     public PoliceRobot(Vector3d position, String name) {
         super(position,name);
@@ -31,35 +33,51 @@ public class PoliceRobot extends Agent {
     public void initBehavior() {}
 
     void setParams(MyEnv ev, double velocity, boolean debug) {
-        setParams(ev);
+        this.ev = ev;
         this.velocity = velocity;
         this.debug = debug;
     }
 
-    void setParams(MyEnv ev) {
-        this.ev = ev;
-    }
 
     /**
      * 运动算法
      */
     public void performBehavior() {
 
-        setTranslationalVelocity(velocity);
-        // frequently change orientation
-        if ((getCounter() % 100) == 0)
-            setRotationalVelocity(Math.PI / 2 * (0.5 - Math.random()));
-
+        if ((getCounter() % 100) == 0) {
+            if (ev.isThiefCaught()) {
+                if (debug)
+                    System.out.println("舒服，盗贼被抓住了！！！");
+                setRotationalVelocity(0);
+                setTranslationalVelocity(0);
+            } else {
+                setTranslationalVelocity(velocity);
+            }
+        }
     }
 
     /**
      * 获取当前位置
      */
-    public Vector2d getPosition() {
+    Vector2d getPosition() {
         Point3d p = new Point3d();
         getCoords(p);
         return new Vector2d(p.z, p.x);
     }
 
+    /**
+     * 设置领航状态
+     */
+    void setIsLeader(boolean status) {
+        isLeader = status;
+    }
 
+    /**
+     * 设置目标点
+     *
+     * @param targetPoint
+     */
+    public void setTargetPoint(Vector2d targetPoint) {
+        this.targetPoint = targetPoint;
+    }
 }

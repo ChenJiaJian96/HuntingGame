@@ -3,8 +3,13 @@ import simbad.sim.Box;
 import simbad.sim.EnvironmentDescription;
 import simbad.sim.Wall;
 
+import javax.vecmath.Vector2d;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Vector3f;
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.lang.Double.POSITIVE_INFINITY;
 
 /**
  * Created by jiajianchen
@@ -18,6 +23,7 @@ public class MyEnv extends EnvironmentDescription {
     private PoliceRobot p1;
     private PoliceRobot p2;
     private PoliceRobot p3;
+    private Vector2d[] catchPosition;
 
     private boolean debug;  // 调试模式
     private double police_speed = 1;
@@ -37,19 +43,21 @@ public class MyEnv extends EnvironmentDescription {
         Wall w4 = new Wall(new Vector3d(0, 0, -10), 20, 1, this);
         add(w4);
 
-         buildObstacles();
+//        buildObstacles();
 
         // 场景构建成功后构建机器人
         thiefRobot = new ThiefRobot(new Vector3d(0, 0, 0), "THIEF");
         thiefRobot.setParams(this, thief_speed, debug);
         add(thiefRobot);
-//        p1 = new PoliceRobot(new Vector3d(-9, 0, -9), "POLICE1");
-//        p1.setParams(this, police_speed, debug);
-//        add(p1);
-//        p2 = new PoliceRobot(new Vector3d(9, 0, -9), "POLICE2");
-//        add(p2);
-//        p3 = new PoliceRobot(new Vector3d(9, 0, 9), "POLICE3");
-//        add(p3);
+        p1 = new PoliceRobot(new Vector3d(-9, 0, -9), "POLICE1");
+        p1.setParams(this, police_speed, debug);
+        add(p1);
+        p2 = new PoliceRobot(new Vector3d(9, 0, -9), "POLICE2");
+        p2.setParams(this, police_speed, debug);
+        add(p2);
+        p3 = new PoliceRobot(new Vector3d(9, 0, 9), "POLICE3");
+        p3.setParams(this, police_speed, debug);
+        add(p3);
     }
 
     /**
@@ -74,20 +82,20 @@ public class MyEnv extends EnvironmentDescription {
         //盒子型障碍物
 //        Box b1 = new Box(new Vector3d(0,0,0), new Vector3f(3, 1, 3),this);
 //        add(b1);
-        Box b2 = new Box(new Vector3d(-4,0,-4), new Vector3f(1, 3, 1),this);
+        Box b2 = new Box(new Vector3d(-4, 0, -4), new Vector3f(1, 3, 1), this);
         add(b2);
-        Box b3 = new Box(new Vector3d(4,0,4), new Vector3f(1, 3, 1),this);
+        Box b3 = new Box(new Vector3d(4, 0, 4), new Vector3f(1, 3, 1), this);
         add(b3);
-        Box b4 = new Box(new Vector3d(-4,0,4), new Vector3f(1, 3, 1),this);
-        add (b4);
-        Box b5 = new Box(new Vector3d(4,0,-4), new Vector3f(1, 3, 1),this);
+        Box b4 = new Box(new Vector3d(-4, 0, 4), new Vector3f(1, 3, 1), this);
+        add(b4);
+        Box b5 = new Box(new Vector3d(4, 0, -4), new Vector3f(1, 3, 1), this);
         add(b5);
 
         //桥型障碍物
-        Arch a1=new Arch(new Vector3d(0,0,6),this);
+        Arch a1 = new Arch(new Vector3d(0, 0, 6), this);
         a1.rotate90(2);
         add(a1);
-        Arch a2=new Arch(new Vector3d(0,0,-6),this);
+        Arch a2 = new Arch(new Vector3d(0, 0, -6), this);
         a2.rotate90(4);
         add(a2);
     }
@@ -122,5 +130,81 @@ public class MyEnv extends EnvironmentDescription {
 
     public PoliceRobot getP3() {
         return p3;
+    }
+
+    public Vector2d[] getCatchPosition() {
+        return catchPosition;
+    }
+
+    /**
+     * 定时更新领航警察机器人
+     */
+    void updateLeader() {
+        Vector2d tp = thiefRobot.getPosition();
+        Vector2d pp1 = p1.getPosition();
+        Vector2d pp2 = p1.getPosition();
+        Vector2d pp3 = p3.getPosition();
+        double[] result = new double[3];
+        List<Vector2d[]> cPList = new ArrayList<>(3);
+        if (MyUtil.cal_point_line(pp2, pp3, pp1, tp) == -1) {
+            // 除去警察1以外两个警察处于两侧
+            Vector2d[] catchPosition = MyUtil.getCatchPosition(tp, pp1, thiefRobot.getRadius());
+            cPList.add(catchPosition);
+            Vector2d v1 = catchPosition[1];
+            Vector2d v2 = catchPosition[2];
+            double result1 = new Vector2d(pp2.x - v1.x, pp2.y - v1.y).length() + new Vector2d(pp3.x - v2.x, pp3.y - v2.y).length();
+            double result2 = new Vector2d(pp2.x - v2.x, pp2.y - v2.y).length() + new Vector2d(pp3.x - v1.x, pp3.y - v1.y).length();
+            result[0] = result1 < result2 ? result1 : result2;
+        } else {
+            result[0] = POSITIVE_INFINITY;
+            cPList.add(new Vector2d[]{});
+        }
+        if (MyUtil.cal_point_line(pp1, pp3, pp2, tp) == -1) {
+            // 除去警察2以外两个警察处于两侧
+            Vector2d[] catchPosition = MyUtil.getCatchPosition(tp, pp2, thiefRobot.getRadius());
+            cPList.add(catchPosition);
+            Vector2d v1 = catchPosition[1];
+            Vector2d v2 = catchPosition[2];
+            double result1 = new Vector2d(pp1.x - v1.x, pp1.y - v1.y).length() + new Vector2d(pp3.x - v2.x, pp3.y - v2.y).length();
+            double result2 = new Vector2d(pp1.x - v2.x, pp1.y - v2.y).length() + new Vector2d(pp3.x - v1.x, pp3.y - v1.y).length();
+            result[1] = result1 < result2 ? result1 : result2;
+        } else {
+            result[1] = POSITIVE_INFINITY;
+            cPList.add(new Vector2d[]{});
+        }
+        if (MyUtil.cal_point_line(pp2, pp1, pp3, tp) == -1) {
+            // 除去警察3以外两个警察处于两侧
+            Vector2d[] catchPosition = MyUtil.getCatchPosition(tp, pp3, thiefRobot.getRadius());
+            cPList.add(catchPosition);
+            Vector2d v1 = catchPosition[1];
+            Vector2d v2 = catchPosition[2];
+            double result1 = new Vector2d(pp2.x - v1.x, pp2.y - v1.y).length() + new Vector2d(pp1.x - v2.x, pp1.y - v2.y).length();
+            double result2 = new Vector2d(pp2.x - v2.x, pp2.y - v2.y).length() + new Vector2d(pp1.x - v1.x, pp1.y - v1.y).length();
+            result[2] = result1 < result2 ? result1 : result2;
+        } else {
+            result[2] = POSITIVE_INFINITY;
+            cPList.add(new Vector2d[]{});
+        }
+        p1.setIsLeader(false);
+        p2.setIsLeader(false);
+        p3.setIsLeader(false);
+        if (result[0] < result[1] && result[0] < result[2]) {
+            p1.setIsLeader(true);
+            catchPosition = cPList.get(0);
+        } else if (result[1] < result[0] && result[1] < result[2]) {
+            p2.setIsLeader(true);
+            catchPosition = cPList.get(1);
+        } else {
+            p3.setIsLeader(true);
+            catchPosition = cPList.get(2);
+        }
+    }
+
+    /**
+     * 判断盗贼机器人是否已经被抓住
+     */
+    boolean isThiefCaught() {
+        return thiefRobot.bumpers.getFrontQuadrantHits() + thiefRobot.bumpers.getLeftQuadrantHits()
+                + thiefRobot.bumpers.getRightQuadrantHits() + thiefRobot.bumpers.getBackQuadrantHits() == 6;
     }
 }
