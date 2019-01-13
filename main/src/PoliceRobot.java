@@ -24,6 +24,7 @@ public class PoliceRobot extends Agent {
     private boolean debug = false;      // 调试状态
     private boolean isLeader = false;   // 是否为领航机器人
     private Vector2d targetPoint = new Vector2d(0, 0);      // 目标点
+    private static int freeze_time = 0;
 
     public PoliceRobot(Vector3d position, String name) {
         super(position,name);
@@ -87,6 +88,21 @@ public class PoliceRobot extends Agent {
 
     Vector2d getTargetPoint() {
         return targetPoint;
+    }
+
+    private boolean isStopForLong(Vector2d pre, Vector2d cur) {
+        if (cur.equals(pre)) {
+            if (freeze_time == 30)
+                // 如果边界设置太小会影响正常的碰撞处理
+                return true;
+            else {
+                freeze_time++;
+                return false;
+            }
+        } else {
+            freeze_time = 0;
+            return false;
+        }
     }
 
     private void walkWithGoal(Vector2d goal) {
@@ -198,6 +214,18 @@ public class PoliceRobot extends Agent {
             }
         } else
             lamp.setBlink(false);
+
+        // 判断是否一直不动
+        // 获取前一次运动位置
+        getCoords(p);
+        Vector2d cur_pos = new Vector2d(p.z, p.x);
+        if (isStopForLong(pos, cur_pos)) {
+            if (debug)
+                System.out.println(this.name + "卡住了！！！");
+            setTranslationalVelocity(0);
+            setRotationalVelocity(Math.PI);
+            freeze_time = 0;
+        }
     }
 
     private boolean checkGoal(Point3d goal3d)//检查是否到达目标
