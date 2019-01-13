@@ -234,7 +234,7 @@ public class MyEnv extends EnvironmentDescription {
     int getThiefState() {
         if (hasSurrounded()) {
             if (hasCaught()) {
-                return 2;
+                return 1;
             } else return 1;
         } else
             return 0;

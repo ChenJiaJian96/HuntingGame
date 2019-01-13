@@ -154,7 +154,6 @@ public class ThiefRobot extends Agent {
         if (bumpers.oneHasHit()) {
             if (debug)
                 System.out.println(this.name + "撞到了！！！");
-            lamp.setBlink(true);
             // 机器人身体三个方向和障碍物的距离
             double left = sonars.getFrontLeftQuadrantMeasurement();
             double right = sonars.getFrontRightQuadrantMeasurement();
@@ -168,8 +167,7 @@ public class ThiefRobot extends Agent {
                     setRotationalVelocity(1 - (0.1 * Math.random()));// 随机向左转
                 }
             }
-        } else
-            lamp.setBlink(false);
+        }
 
         // 判断是否一直不动
         // 获取前一次运动位置
