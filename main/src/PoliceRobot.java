@@ -46,7 +46,7 @@ public class PoliceRobot extends Agent {
      */
     public void performBehavior() {
 
-        if ((getCounter() % 100) == 0) {
+        if ((getCounter() % 10) == 0) {
             if (ev.getThiefState() == 2) {
                 if (debug)
                     System.out.println("盗贼被抓住了！！！");

@@ -53,7 +53,7 @@ public class ThiefRobot extends Agent {
     @Override
     protected void performBehavior() {
 
-        if (getCounter() % 100 == 0) {
+        if (getCounter() % 10 == 0) {
 
             if (ev.getThiefState() == 2) {
                 if (debug)
