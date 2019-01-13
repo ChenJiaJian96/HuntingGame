@@ -23,6 +23,7 @@ public class MyEnv extends EnvironmentDescription {
     private PoliceRobot p1;
     private PoliceRobot p2;
     private PoliceRobot p3;
+    private ArrayList<PoliceRobot> PRs = new ArrayList<>();
     private Vector2d[] catchPosition;
 
     private boolean debug;  // 调试模式
@@ -58,6 +59,9 @@ public class MyEnv extends EnvironmentDescription {
         p3 = new PoliceRobot(new Vector3d(9, 0, 9), "POLICE3");
         p3.setParams(this, police_speed, debug);
         add(p3);
+        PRs.add(p1);
+        PRs.add(p2);
+        PRs.add(p3);
     }
 
     /**
@@ -191,20 +195,74 @@ public class MyEnv extends EnvironmentDescription {
         if (result[0] < result[1] && result[0] < result[2]) {
             p1.setIsLeader(true);
             catchPosition = cPList.get(0);
+            updateCaughtPoint(1);
         } else if (result[1] < result[0] && result[1] < result[2]) {
             p2.setIsLeader(true);
             catchPosition = cPList.get(1);
+            updateCaughtPoint(2);
         } else {
             p3.setIsLeader(true);
             catchPosition = cPList.get(2);
+            updateCaughtPoint(3);
         }
     }
 
     /**
-     * 判断盗贼机器人是否已经被抓住
+     * 定时更新警察机器人各自的围捕点
      */
-    boolean isThiefCaught() {
-        return thiefRobot.bumpers.getFrontQuadrantHits() + thiefRobot.bumpers.getLeftQuadrantHits()
-                + thiefRobot.bumpers.getRightQuadrantHits() + thiefRobot.bumpers.getBackQuadrantHits() == 6;
+    private void updateCaughtPoint(int i) {
+        if (i == 1) {
+            p1.setTargetPoint(catchPosition[0]);
+            Vector2d v1 = catchPosition[1];
+            Vector2d v2 = catchPosition[2];
+            double d1 = new Vector2d(p2.getPosition().x - v1.x, p2.getPosition().y - v1.y).length();
+            double d2 = new Vector2d(p2.getPosition().x - v2.x, p2.getPosition().y - v2.y).length();
+            if (d1 < d2) {
+                p2.setTargetPoint(v1);
+                p3.setTargetPoint(v2);
+            } else {
+                p2.setTargetPoint(v2);
+                p3.setTargetPoint(v1);
+            }
+        }
+    }
+
+    /**
+     * 判断警察和盗贼位置的当前状态
+     * 0:未形成包围圈 1:形成包围圈 2:已被围捕
+     */
+    int getThiefState() {
+        if (hasSurrounded()) {
+            if (hasCaught()) {
+                return 2;
+            } else return 1;
+        } else
+            return 0;
+    }
+
+    /**
+     * 判断是否已经形成包围圈
+     */
+    private boolean hasSurrounded() {
+        double lambda = police_speed / thief_speed;
+        double R = 3 * thiefRobot.getRadius();
+        Vector2d tp = thiefRobot.getPosition();
+        for (PoliceRobot robot : PRs) {
+            double dis = MyUtil.getDistance(robot.getPosition(), tp);
+            double sita = Math.acos((Math.pow(MyUtil.getDistance(robot.getPosition(), robot.getTargetPoint()), 2) - R * R - dis * dis) / (2 * R * dis));
+            if (Math.sin(sita) > 1 / lambda)
+                return false;
+        }
+        return true;
+    }
+
+    /**
+     * 判断是否已经围捕
+     * 三等分位置均有碰撞
+     */
+    private boolean hasCaught() {
+        return thiefRobot.bumpers.getQuadrantHits(0, Math.PI * 2 / 3) >= 1
+                && thiefRobot.bumpers.getQuadrantHits(Math.PI * 2 / 3, Math.PI * 4 / 3) >= 1
+                && thiefRobot.bumpers.getQuadrantHits(Math.PI * 4 / 3, Math.PI * 2) >= 1;
     }
 }

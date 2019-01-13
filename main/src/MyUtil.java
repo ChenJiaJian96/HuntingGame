@@ -206,4 +206,10 @@ public class MyUtil {
         return new Vector2d[]{point1, point2, point3};
     }
 
+    /**
+     * 获取两坐标之间的距离
+     */
+    static double getDistance(Vector2d v1, Vector2d v2) {
+        return new Vector2d(v1.x - v2.x, v1.y - v2.y).length();
+    }
 }

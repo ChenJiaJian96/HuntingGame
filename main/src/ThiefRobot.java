@@ -55,7 +55,7 @@ public class ThiefRobot extends Agent {
 
         if (getCounter() % 100 == 0) {
 
-            if (ev.isThiefCaught()) {
+            if (ev.getThiefState() == 2) {
                 if (debug)
                     System.out.println("GG...我被抓住了！！！");
                 setRotationalVelocity(0);
@@ -103,7 +103,7 @@ public class ThiefRobot extends Agent {
      * 漫无目的地移动，避开障碍物
      * 人工势场法
      */
-    void walkNoGoal() {
+    private void walkNoGoal() {
         setTranslationalVelocity(this.velocity);
 
         // 获取速度
