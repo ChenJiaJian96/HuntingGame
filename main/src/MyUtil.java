@@ -184,7 +184,7 @@ public class MyUtil {
      * @return [领航机器人围捕点, 围捕点2, 围捕点3]
      */
     static Vector2d[] getCatchPosition(Vector2d tp, Vector2d lp, double radius) {
-        double R = radius * 3;
+        double R = radius * MyEnv.N_RADIUS;
         double k = R / lp.length();
         Vector2d point1 = new Vector2d(k * lp.x, k * lp.y);   // 领航机器人的围捕点
         Vector2d point2 = new Vector2d();

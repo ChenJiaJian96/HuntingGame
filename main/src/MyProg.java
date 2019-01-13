@@ -9,7 +9,7 @@ import simbad.gui.Simbad;
 public class MyProg {
 
     public static void main(String[] args) {
-        MyEnv ev = new MyEnv(true);
+        MyEnv ev = new MyEnv(false);
         ev.setSpeed(1,1);
         Simbad frame = new Simbad(ev ,false);
     }

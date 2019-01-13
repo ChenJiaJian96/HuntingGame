@@ -28,7 +28,8 @@ public class MyEnv extends EnvironmentDescription {
 
     private boolean debug;  // 调试模式
     private double police_speed = 1;
-    private double thief_speed = 1;
+    private double thief_speed = 0.5;
+    static final int N_RADIUS = 5;     // 设置围捕圈和机器人的半径之比
 
     MyEnv(boolean d) {
         this.debug = d;
@@ -245,7 +246,7 @@ public class MyEnv extends EnvironmentDescription {
      */
     private boolean hasSurrounded() {
         double lambda = police_speed / thief_speed;
-        double R = 3 * thiefRobot.getRadius();
+        double R = N_RADIUS * thiefRobot.getRadius();
         Vector2d tp = thiefRobot.getPosition();
         for (PoliceRobot robot : PRs) {
             double dis = MyUtil.getDistance(robot.getPosition(), tp);

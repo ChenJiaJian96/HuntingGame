@@ -26,6 +26,8 @@ public class PoliceRobot extends Agent {
     private boolean isLeader = false;   // 是否为领航机器人
     private Vector2d targetPoint = new Vector2d(0, 0);      // 目标点
     private static int freeze_time = 0;
+    private static Color3f mLeaderColor = new Color3f(60, 60, 60);
+    private static Color3f mCommonColor = new Color3f(20, 20, 20);
 
     public PoliceRobot(Vector3d position, String name) {
         super(position,name);
@@ -50,6 +52,10 @@ public class PoliceRobot extends Agent {
     public void performBehavior() {
 
         if ((getCounter() % 10) == 0) {
+            if (isLeader)
+                setColor(mLeaderColor);
+            else
+                setColor(mCommonColor);
             if (ev.getThiefState() == 2) {
                 if (debug)
                     System.out.println("盗贼被抓住了！！！");
