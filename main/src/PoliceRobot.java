@@ -3,6 +3,7 @@ import simbad.sim.LampActuator;
 import simbad.sim.RangeSensorBelt;
 import simbad.sim.RobotFactory;
 
+import javax.vecmath.Color3f;
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector2d;
 import javax.vecmath.Vector3d;
@@ -31,6 +32,7 @@ public class PoliceRobot extends Agent {
         sonars = RobotFactory.addSonarBeltSensor(this, 8);
         bumpers = RobotFactory.addBumperBeltSensor(this);
         lamp = RobotFactory.addLamp(this);
+        setColor(new Color3f(20, 20, 20));
     }
 
     public void initBehavior() {}
