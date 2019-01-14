@@ -45,4 +45,6 @@ static Vector2d[] getCatchPosition(Vector2d tp, Vector2d lp, double radius)
 
 
 ## 参考文献
-陈阳舟，王文星，代桂平.基于角度优先的多机器人围捕策略[A].北京工业大学-电子信息与控制工程学院-2012
+> 陈阳舟，王文星，代桂平.基于角度优先的多机器人围捕策略[A].北京工业大学-电子信息与控制工程学院-2012
+
+[《基于角度优先的多机器人围捕策略》文献链接](http://kns.cnki.net/KCMS/detail/detail.aspx?dbcode=CJFQ&amp;dbname=CJFD2012&amp;filename=BJGD201205014&amp;uid=WEEvREdxOWJmbC9oM1NjYkZCbDdrdXdTQ2NzdVZaeCtSb1BNSjgzUWZVcHQ=$R1yZ0H6jyaa0en3RxVUd8df-oHi7XMMDo7mtKT6mSmEvTuk11l2gFA!!&amp;v=MDA4NzdXTTFGckNVUkxPZlp1ZHJGeWpsVUw3T0p5Zk1hckc0SDlQTXFvOUVZSVI4ZVgxTHV4WVM3RGgxVDNxVHI= )
