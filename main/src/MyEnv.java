@@ -125,22 +125,6 @@ public class MyEnv extends EnvironmentDescription {
         return thiefRobot;
     }
 
-    public PoliceRobot getP1() {
-        return p1;
-    }
-
-    public PoliceRobot getP2() {
-        return p2;
-    }
-
-    public PoliceRobot getP3() {
-        return p3;
-    }
-
-    public Vector2d[] getCatchPosition() {
-        return catchPosition;
-    }
-
     /**
      * 定时更新领航警察机器人
      */
