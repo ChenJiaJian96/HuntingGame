@@ -45,7 +45,7 @@ public class MyEnv extends EnvironmentDescription {
         Wall w4 = new Wall(new Vector3d(0, 0, -10), 20, 1, this);
         add(w4);
 
-//        buildObstacles();
+        buildObstacles();
 
         // 场景构建成功后构建机器人
         thiefRobot = new ThiefRobot(new Vector3d(0, 0, 0), "THIEF");

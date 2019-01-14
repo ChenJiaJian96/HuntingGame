@@ -87,8 +87,6 @@ public class PoliceRobot extends Agent {
 
     /**
      * 设置目标点
-     *
-     * @param targetPoint
      */
     void setTargetPoint(Vector2d targetPoint) {
         this.targetPoint = targetPoint;
@@ -98,6 +96,9 @@ public class PoliceRobot extends Agent {
         return targetPoint;
     }
 
+    /**
+     * 判断是否长期静止
+     */
     private boolean isStopForLong(Vector2d pre, Vector2d cur) {
         if (cur.equals(pre)) {
             if (freeze_time == 30)
@@ -113,6 +114,10 @@ public class PoliceRobot extends Agent {
         }
     }
 
+    /**
+     * 向目标移动，避开障碍物
+     * 人工势场法
+     */
     private void walkWithGoal(Vector2d goal) {
 
         setTranslationalVelocity(this.velocity);
@@ -234,8 +239,10 @@ public class PoliceRobot extends Agent {
         }
     }
 
-    private boolean checkGoal(Point3d goal3d)//检查是否到达目标
-    {
+    /**
+     * 检查是否到达目标
+     */
+    private boolean checkGoal(Point3d goal3d) {
         // 当前位置
         Point3d currentPos = new Point3d();
         getCoords(currentPos);
